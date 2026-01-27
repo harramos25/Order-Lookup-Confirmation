@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed | CassNcase</title>
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Nunito:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <!-- Styles -->
+    <link rel="stylesheet" href="index.css">
+    <style>
+        .success-icon {
+            font-size: 4rem;
+            color: #aedcb6;
+            margin-bottom: 1rem;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container" style="text-align: center; margin-top: 10vh;">
+        <div class="glass-panel" style="padding: 3rem 2rem;">
+            <div class="success-icon">✨</div>
+            <h1 style="margin-bottom: 1rem;">All Set!</h1>
+            <p style="font-size: 1.1rem; margin-bottom: 2rem; color: var(--cream-text);">
+                Your order has been confirmed.<br>
+                <span style="font-size: 0.95rem; color: var(--sage-soft);">Thank you for helping us keep our records
+                    accurate.</span>
+            </p>
+
+            <a href="confirm-order.html" class="btn btn-primary">Back to Home</a>
+        </div>
+    </div>
+</body>
+
+</html>

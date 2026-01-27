@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Updates | CassNcase</title>
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Nunito:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <!-- Styles -->
+    <link rel="stylesheet" href="index.css">
+    <style>
+        .checkbox-group {
+            text-align: left;
+            margin: 1.5rem 0;
+        }
+
+        .checkbox-option {
+            background: rgba(42, 36, 56, 0.4);
+            border: 1px solid var(--lilac-deep);
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .checkbox-option:hover {
+            background: rgba(122, 108, 157, 0.2);
+        }
+
+        .checkbox-option input[type="checkbox"] {
+            margin-right: 1rem;
+            transform: scale(1.2);
+            accent-color: var(--gold-accent);
+        }
+
+        .checkbox-option label {
+            margin: 0;
+            color: var(--cream-text);
+            cursor: pointer;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header style="text-align: center; margin-bottom: 2rem;">
+            <h1>What Needs Updating?</h1>
+            <p style="color: var(--sage-soft);">Select the details you would like to change.</p>
+        </header>
+
+        <div class="glass-panel" style="padding: 2rem;">
+            <div id="selectionForm">
+                <div class="checkbox-group">
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="checkName" value="fullName">
+                        <label for="checkName">Full Name</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="checkAddress" value="shippingAddress">
+                        <label for="checkAddress">Shipping Address</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="checkPhone" value="phone">
+                        <label for="checkPhone">Phone Number</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="checkEmail" value="email">
+                        <label for="checkEmail">Email Address</label>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button id="continueBtn" class="btn btn-primary" style="width: 100%;">Continue</button>
+                    <a href="confirm-order.html"
+                        style="display: block; margin-top: 1rem; color: var(--sage-soft); text-decoration: none; font-size: 0.9rem;">Back</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="buyers.js"></script>
+    <script src="app.js"></script>
+    <script>
+        // Check session
+        const buyer = App.getCurrentBuyer();
+        if (!buyer) {
+            // No session, redirect to home
+            window.location.href = 'confirm-order.html';
+        }
+
+        const continueBtn = document.getElementById('continueBtn');
+        const inputs = document.querySelectorAll('input[type="checkbox"]');
+
+        continueBtn.addEventListener('click', () => {
+            const selected = [];
+            inputs.forEach(input => {
+                if (input.checked) {
+                    selected.push(input.value);
+                }
+            });
+
+            if (selected.length === 0) {
+                alert("Please select at least one item to update.");
+                return;
+            }
+
+            // Save selection
+            App.setUpdateSelection(selected);
+            // Navigate
+            window.location.href = 'update-form.html';
+        });
+    </script>
+</body>
+
+</html>

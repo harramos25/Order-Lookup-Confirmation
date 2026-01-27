@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Your Order | CassNcase</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Nunito:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <!-- Styles -->
+    <link rel="stylesheet" href="index.css">
+    <style>
+        /* specific styles for this page */
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .subtitle {
+            color: var(--sage-soft);
+            font-size: 0.95rem;
+            margin-top: 0.5rem;
+        }
+
+        .order-preview {
+            display: none;
+            /* Hidden by default */
+            margin-top: 2rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .preview-details {
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid rgba(122, 108, 157, 0.2);
+            padding-bottom: 0.5rem;
+        }
+
+        .detail-label {
+            color: var(--lilac-light);
+            font-size: 0.9rem;
+        }
+
+        .detail-value {
+            color: var(--cream-text);
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .error-msg {
+            display: none;
+            color: var(--warning-red);
+            margin-top: 1rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header class="page-header">
+            <h1>Confirm Your Order</h1>
+            <p class="subtitle">For privacy reasons, order details are not publicly listed.</p>
+        </header>
+
+        <!-- Search Section -->
+        <div id="searchSection" class="glass-panel" style="padding: 2rem;">
+            <div class="input-group">
+                <label for="searchInput">Email Address OR Phone Number</label>
+                <input type="text" id="searchInput" placeholder="e.g. sky@example.com">
+            </div>
+            <button id="searchBtn" class="btn btn-primary" style="width: 100%;">Search Order</button>
+            <p id="errorMsg" class="error-msg">We couldn’t find an order using that information.</p>
+        </div>
+
+        <!-- Order Preview Section -->
+        <div id="orderPreview" class="order-preview glass-panel" style="padding: 2rem;">
+            <h2
+                style="font-size: 1.5rem; border-bottom: 1px solid var(--gold-accent); padding-bottom: 0.5rem; margin-bottom: 1rem;">
+                Order Found</h2>
+
+            <div class="preview-details">
+                <div class="detail-row">
+                    <span class="detail-label">Full Name</span>
+                    <span class="detail-value" id="dispName"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Email</span>
+                    <span class="detail-value" id="dispEmail"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Phone</span>
+                    <span class="detail-value" id="dispPhone"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Order Type</span>
+                    <span class="detail-value" id="dispType"></span>
+                </div>
+                <!-- Address hidden in summary or shown? Request said "Shipping Address" is displayed -->
+                <div class="detail-row">
+                    <span class="detail-label">Shipping To</span>
+                    <span class="detail-value" id="dispAddress" style="max-width: 60%; text-align: right;"></span>
+                </div>
+                <!-- Status hidden as requested -->
+                <!-- 
+                <div class="detail-row" style="border-bottom: none; margin-top: 1rem; align-items: center;">
+                    <span class="detail-label">Status</span>
+                    <span id="dispStatus" class="badge"></span>
+                </div> 
+                -->
+            </div>
+
+            <div class="action-buttons">
+                <!-- Confirm Button with Gold/Sage Check -->
+                <button id="confirmBtn" class="btn btn-primary"
+                    style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 6L9 17L4 12" stroke="var(--gold-accent)" stroke-width="2.5" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    Confirm Order
+                </button>
+
+                <!-- Update Button with Lilac/Cream Pencil -->
+                <button id="updateBtn" class="btn btn-secondary"
+                    style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13"
+                            stroke="var(--lilac-light)" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path
+                            d="M18.5 2.50001C18.8978 2.10218 19.4374 1.87869 20 1.87869C20.5626 1.87869 21.1022 2.10218 21.5 2.50001C21.8978 2.89783 22.1213 3.4374 22.1213 4.00001C22.1213 4.56262 21.8978 5.10218 21.5 5.50001L12 15L8 16L9 12L18.5 2.50001Z"
+                            stroke="var(--lilac-light)" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    Need to Update?
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="buyers.js"></script>
+    <script src="app.js"></script>
+    <script>
+        // Page specific logic
+        const searchBtn = document.getElementById('searchBtn');
+        const searchInput = document.getElementById('searchInput');
+        const errorMsg = document.getElementById('errorMsg');
+        const orderPreview = document.getElementById('orderPreview');
+        const searchSection = document.getElementById('searchSection');
+
+        // Display fields
+        const dispName = document.getElementById('dispName');
+        const dispEmail = document.getElementById('dispEmail');
+        const dispPhone = document.getElementById('dispPhone');
+        const dispType = document.getElementById('dispType');
+        const dispAddress = document.getElementById('dispAddress');
+        const dispStatus = document.getElementById('dispStatus');
+
+        // Buttons
+        const confirmBtn = document.getElementById('confirmBtn');
+        const updateBtn = document.getElementById('updateBtn');
+
+        let currentBuyerId = null;
+
+        searchBtn.addEventListener('click', () => {
+            const query = searchInput.value;
+            const buyer = App.findBuyer(query); // App.js logic
+
+            if (buyer) {
+                // Success
+                errorMsg.style.display = 'none';
+                showPreview(buyer);
+            } else {
+                // Fail
+                errorMsg.style.display = 'block';
+                orderPreview.style.display = 'none';
+            }
+        });
+
+        function showPreview(buyer) {
+            currentBuyerId = buyer.id;
+
+            // Populate data
+            dispName.textContent = buyer.fullName;
+            dispEmail.textContent = buyer.email;
+            dispPhone.textContent = buyer.phone;
+            dispType.textContent = buyer.orderType;
+            dispAddress.textContent = buyer.shippingAddress;
+
+            // Status Badge (Hidden)
+            /*
+            dispStatus.textContent = buyer.status;
+            dispStatus.className = 'badge'; // reset
+            if (buyer.status.includes('Confirmed')) {
+                dispStatus.classList.add('badge-confirmed');
+            } else {
+                dispStatus.classList.add('badge-pending');
+            }
+            */
+
+            // Show section
+            orderPreview.style.display = 'block';
+
+            // Optional: Hide search to reduce clutter? Or keep it to allow re-search?
+            // User flow: "If match found -> display Order Preview Card". 
+            // We'll keep search visible but maybe collapse it? nah, simpler is better.
+        }
+
+        // Action Handlers
+        confirmBtn.addEventListener('click', () => {
+            if (!currentBuyerId) return;
+            // Log confirmation
+            App.logAction(currentBuyerId, 'CONFIRM');
+            // Navigate to success
+            window.location.href = 'success.html';
+        });
+
+        updateBtn.addEventListener('click', () => {
+            if (!currentBuyerId) return;
+            // Set session
+            App.startSession(currentBuyerId);
+            // Navigate to update picker
+            window.location.href = 'update-pick.html';
+        });
+
+    </script>
+</body>
+
+</html>

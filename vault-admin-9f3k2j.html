@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vault Admin | CassNcase</title>
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Nunito:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Styles -->
+    <link rel="stylesheet" href="index.css">
+    <style>
+        .container {
+            max-width: 1000px;
+            /* Wider for table */
+        }
+
+        /* Login Overlay */
+        #loginOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--plum-midnight);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 2rem;
+            background: rgba(42, 36, 56, 0.4);
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: var(--cream-text);
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(122, 108, 157, 0.2);
+        }
+
+        th {
+            background: rgba(122, 108, 157, 0.2);
+            color: var(--lilac-light);
+            font-family: 'Cinzel Decorative', serif;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .td-status {
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .status-ok {
+            color: #aedcb6;
+        }
+
+        .status-pending {
+            color: var(--gold-accent);
+        }
+
+        /* Scroll to Top Button */
+        #scrollTopBtn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--lilac-deep);
+            color: var(--cream-text);
+            border: 1px solid var(--lilac-light);
+            border-radius: 50%;
+            padding: 0;
+            /* Fix centering */
+            display: flex;
+            align-items: center;
+            /* Ensure vertical centering */
+            justify-content: center;
+            /* Ensure horizontal centering */
+            line-height: 0;
+            /* Remove text height influence */
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        #scrollTopBtn:hover {
+            transform: translateY(-5px);
+            background: var(--plum-darker);
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            header.admin-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .container {
+                width: 95%;
+                margin: 1rem auto;
+            }
+
+            /* Make table scrollable horizontally but card-like look */
+            .table-container {
+                margin-top: 1rem;
+            }
+
+            th,
+            td {
+                padding: 0.8rem 0.5rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Security Overlay -->
+    <div id="loginOverlay">
+        <div class="glass-panel" style="padding: 3rem; text-align: center;">
+            <h2 style="margin-bottom: 1.5rem;">Vault Access</h2>
+            <input type="password" id="passcode" placeholder="Enter Passcode"
+                style="margin-bottom: 1rem; text-align: center; letter-spacing: 4px;">
+            <button id="unlockBtn" class="btn btn-primary" style="width: 100%;">Unlock</button>
+            <p id="authError" style="color: var(--warning-red); display: none; margin-top: 1rem;">Access Denied</p>
+        </div>
+    </div>
+
+    <!-- Admin Content -->
+    <div class="container" id="adminContent" style="display: none; opacity: 0; transition: opacity 1s;">
+        <header class="admin-header"
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1>Order Confirmations</h1>
+            <button id="exportBtn" class="btn btn-secondary" style="display: flex; align-items: center; gap: 8px;">
+                <img src="Images/excel.png" alt="Excel" width="20" height="20">
+                Export Excel
+            </button>
+        </header>
+
+        <div class="glass-panel" style="padding: 1rem;">
+            <div class="table-container">
+                <table id="ordersTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Address</th>
+                            <th>Order Type</th>
+                            <th>Status</th>
+                            <!-- <th>Last Action</th> -->
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- JS Populated -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scroll To Top Button -->
+    <button id="scrollTopBtn" title="Go to top">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 19V5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M5 12L12 5L19 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+        </svg>
+    </button>
+
+    <!-- SheetJS for Excel Export -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script src="buyers.js"></script>
+    <script src="app.js"></script>
+    <script>
+        // --- Security ---
+        const loginOverlay = document.getElementById('loginOverlay');
+        const adminContent = document.getElementById('adminContent');
+        const passcodeIn = document.getElementById('passcode');
+        const unlockBtn = document.getElementById('unlockBtn');
+        const authError = document.getElementById('authError');
+
+        // Check for existing session
+        if (sessionStorage.getItem('vault_unlocked') === 'true') {
+            showVault(false); // Immediate show
+        }
+
+        unlockBtn.addEventListener('click', () => {
+            if (passcodeIn.value === '1234') {
+                showVault(true);
+            } else {
+                authError.style.display = 'block';
+            }
+        });
+
+        function showVault(animate) {
+            sessionStorage.setItem('vault_unlocked', 'true');
+            loginOverlay.style.display = 'none';
+            adminContent.style.display = 'block';
+
+            if (animate) {
+                setTimeout(() => adminContent.style.opacity = 1, 50);
+            } else {
+                adminContent.style.opacity = 1;
+            }
+            loadTable();
+        }
+
+        // --- Data Logic ---
+        function loadTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            const allBuyers = window.MOCK_BUYERS;
+            const logs = App.getLogs();
+
+            allBuyers.forEach(buyer => {
+                let displayBuyer = { ...buyer };
+
+                const buyerUpdates = logs.filter(l => l.buyerId === buyer.id && l.action === 'UPDATE');
+                if (buyerUpdates.length > 0) {
+                    displayBuyer.status = "Confirmed (Updated)";
+                    buyerUpdates.forEach(u => {
+                        if (u.changes) displayBuyer = { ...displayBuyer, ...u.changes };
+                    });
+                } else {
+                    const confirmed = logs.find(l => l.buyerId === buyer.id && l.action === 'CONFIRM');
+                    if (confirmed) {
+                        displayBuyer.status = "Confirmed";
+                    }
+                }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span style="color: var(--sage-soft); font-size: 0.8rem;">${displayBuyer.id}</span></td>
+                    <td>${displayBuyer.fullName}</td>
+                    <td>${displayBuyer.email}</td>
+                    <td>${displayBuyer.phone}</td>
+                    <td style="font-size: 0.9rem; max-width: 300px;">${displayBuyer.shippingAddress || displayBuyer.address}</td>
+                    <td>${displayBuyer.orderType}</td>
+                    <td class="td-status ${displayBuyer.status.includes('Confirmed') ? 'status-ok' : 'status-pending'}">
+                        ${displayBuyer.status}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- Export to Excel (.xlsx) using SheetJS ---
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            const logs = App.getLogs();
+            const allBuyers = window.MOCK_BUYERS;
+
+            // Prepare Data for Sheet
+            const dataToExport = allBuyers.map(buyer => {
+                let final = { ...buyer };
+                const updates = logs.filter(l => l.buyerId === buyer.id && l.action === 'UPDATE');
+                if (updates.length > 0) {
+                    final.status = "Confirmed (Updated)";
+                    updates.forEach(u => { if (u.changes) final = { ...final, ...u.changes }; });
+                } else if (logs.find(l => l.buyerId === buyer.id && l.action === 'CONFIRM')) {
+                    final.status = "Confirmed";
+                }
+
+                return {
+                    "Order ID": final.id,
+                    "Full Name": final.fullName,
+                    "Email": final.email,
+                    "Phone": final.phone,
+                    "Address": final.shippingAddress || final.address,
+                    "Order Type": final.orderType,
+                    "Status": final.status
+                };
+            });
+
+            // Creates a new workbook
+            const wb = XLSX.utils.book_new();
+            // Converts json to sheet
+            const ws = XLSX.utils.json_to_sheet(dataToExport);
+
+            // Adjust column widths (optional polish)
+            const wscols = [
+                { wch: 10 }, // ID
+                { wch: 20 }, // Name
+                { wch: 25 }, // Email
+                { wch: 15 }, // Phone
+                { wch: 30 }, // Address
+                { wch: 20 }, // Type
+                { wch: 20 }  // Status
+            ];
+            ws['!cols'] = wscols;
+
+            // Append sheet to workbook
+            XLSX.utils.book_append_sheet(wb, ws, "Order Confirmations");
+
+            // Download file
+            XLSX.writeFile(wb, "CassNcase_Orders.xlsx");
+        });
+
+        // --- Scroll to Top Logic ---
+        const scrollBtn = document.getElementById('scrollTopBtn');
+
+        // Always active
+        scrollBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+    </script>
+</body>
+
+</html>

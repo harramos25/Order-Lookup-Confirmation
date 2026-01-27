@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Details | CassNcase</title>
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Nunito:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <!-- Styles -->
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <header style="text-align: center; margin-bottom: 2rem;">
+            <h1>Update Details</h1>
+            <p style="color: var(--sage-soft);">Please provide the correct information below.</p>
+        </header>
+
+        <div class="glass-panel" style="padding: 2rem;">
+            <form id="dynamicForm">
+                <div id="formFields">
+                    <!-- Javascript will populate this -->
+                </div>
+
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Submit Update & Confirm</button>
+                    <a href="update-pick.html"
+                        style="display: block; margin-top: 1rem; color: var(--sage-soft); text-decoration: none; font-size: 0.9rem;">Back</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="buyers.js"></script>
+    <script src="app.js"></script>
+    <script>
+        // Check session
+        const buyer = App.getCurrentBuyer();
+        const fieldsToUpdate = App.getUpdateSelection(); // ['email', 'phone', etc.]
+
+        if (!buyer || fieldsToUpdate.length === 0) {
+            window.location.href = 'confirm-order.html';
+        }
+
+        const formContainer = document.getElementById('formFields');
+        const dynamicForm = document.getElementById('dynamicForm');
+
+        // Field Config for Labels and Types
+        const fieldConfig = {
+            fullName: { label: "Full Name", type: "text" },
+            email: { label: "Email Address", type: "email" },
+            phone: { label: "Phone Number", type: "tel" },
+            shippingAddress: { label: "Shipping Address", type: "text" }
+        };
+
+        // Render Fields
+        fieldsToUpdate.forEach(fieldKey => {
+            const config = fieldConfig[fieldKey];
+            if (!config) return;
+
+            const div = document.createElement('div');
+            div.className = 'input-group';
+
+            const label = document.createElement('label');
+            label.textContent = config.label;
+            label.htmlFor = fieldKey;
+
+            const input = document.createElement('input');
+            input.type = config.type;
+            input.id = fieldKey;
+            input.name = fieldKey;
+            input.value = buyer[fieldKey] || ''; // Pre-fill
+            input.required = true;
+
+            div.appendChild(label);
+            div.appendChild(input);
+            formContainer.appendChild(div);
+        });
+
+        // Handle Submit
+        dynamicForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // Collect Data
+            const changes = {};
+            fieldsToUpdate.forEach(key => {
+                const val = document.getElementById(key).value;
+                if (val !== buyer[key]) {
+                    changes[key] = val;
+                }
+            });
+
+            // Log update (even if no "real" change detected, we log the confirmation of intent to update)
+            // But usually we want to confirm the order too.
+            // The button says "Submit Update & Confirm", so we do both (Update log implicitly confirms).
+
+            // If changes is empty, it means they submitted the same data. We should still treat it as a confirmation/update.
+
+            App.logAction(buyer.id, 'UPDATE', changes);
+            window.location.href = 'success.html';
+        });
+
+    </script>
+</body>
+
+</html>
