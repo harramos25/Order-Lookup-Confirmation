@@ -188,14 +188,14 @@
     <script src="app.js"></script>
     <script src="ui-fx.js"></script>
     <script>
-        // Page specific logic
+        // Logic para sa page na ito
         const searchBtn = document.getElementById('searchBtn');
         const searchInput = document.getElementById('searchInput');
         const errorMsg = document.getElementById('errorMsg');
         const orderPreview = document.getElementById('orderPreview');
         const searchSection = document.getElementById('searchSection');
 
-        // Display fields
+        // Dito yung mga fields na pag-didisplayan natin
         const dispName = document.getElementById('dispName');
         const dispEmail = document.getElementById('dispEmail');
         const dispPhone = document.getElementById('dispPhone');
@@ -203,7 +203,7 @@
         const dispAddress = document.getElementById('dispAddress');
         const dispStatus = document.getElementById('dispStatus');
 
-        // Buttons
+        // Dito naman yung mga buttons
         const confirmBtn = document.getElementById('confirmBtn');
         const updateBtn = document.getElementById('updateBtn');
 
@@ -212,7 +212,7 @@
         searchBtn.addEventListener('click', async () => {
             const query = searchInput.value.trim();
 
-            // 1. Empty Check
+            // 1. Check muna natin kung empty
             if (!query) {
                 errorMsg.textContent = "You cannot search without info. Please enter your Email or Phone.";
                 errorMsg.style.display = 'block';
@@ -220,15 +220,15 @@
                 return;
             }
 
-            // 2. Search
+            // 2. Search na tayo
             const buyer = await App.findBuyer(query);
 
             if (buyer) {
-                // Success
+                // Success! May nahanap tayo.
                 errorMsg.style.display = 'none';
                 showPreview(buyer);
             } else {
-                // 3. Not Found (Wrong Data)
+                // 3. Not Found (Mali yung info na nilagay)
                 errorMsg.textContent = "Wrong Email or Phone Number. Please recheck your details.";
                 errorMsg.style.display = 'block';
                 orderPreview.style.display = 'none';
@@ -238,15 +238,14 @@
         function showPreview(buyer) {
             currentBuyerId = buyer.order_id || buyer.id;
 
-            // Populate data
-            // Populate data
+            // I-populate na natin yung data sa UI components
             dispName.textContent = buyer.full_name || buyer.fullName || '-';
             dispEmail.textContent = buyer.email || '-';
             dispPhone.textContent = buyer.phone || '-';
             dispType.textContent = buyer.order_type || buyer.orderType || '-';
             dispAddress.textContent = buyer.address || buyer.shippingAddress || '-';
 
-            // Status Badge (Hidden)
+            // Status Badge (Naka-hide muna based sa request)
             /*
             dispStatus.textContent = buyer.status;
             dispStatus.className = 'badge'; // reset
@@ -257,28 +256,26 @@
             }
             */
 
-            // Show section
+            // Pakita na yung section
             orderPreview.style.display = 'block';
 
-            // Optional: Hide search to reduce clutter? Or keep it to allow re-search?
-            // User flow: "If match found -> display Order Preview Card". 
-            // We'll keep search visible but maybe collapse it? nah, simpler is better.
+            // Keep lang natin yung search visible para safe.
         }
 
-        // Action Handlers
+        // Mga Action Handlers dito
         confirmBtn.addEventListener('click', async () => {
             if (!currentBuyerId) return;
-            // Log confirmation
+            // I-log natin yung confirmation
             await App.logAction(currentBuyerId, 'CONFIRM');
-            // Navigate to success
+            // Lipat na sa success page
             window.location.href = 'success.html';
         });
 
         updateBtn.addEventListener('click', () => {
             if (!currentBuyerId) return;
-            // Set session
+            // Simulan na yung session
             App.startSession(currentBuyerId);
-            // Navigate to update picker
+            // Lipat na sa update picker
             window.location.href = 'update-pick.html';
         });
 

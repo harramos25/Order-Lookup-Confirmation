@@ -1,6 +1,6 @@
 /**
  * StorageService
- * Handles data persistence via IndexedDB (Prototype Mode) or Google Sheets API (Production Mode).
+ * Dito naka-manage yung pag-save ng data natin (IndexedDB o Sheets).
  */
 const StorageService = {
     dbName: 'CassNcaseDB',
@@ -13,7 +13,7 @@ const StorageService = {
     },
 
     /**
-     * Initialize Storage
+     * I-init muna yung storage natin.
      */
     init: async function () {
         if (this.db) return Promise.resolve(true);
@@ -29,9 +29,9 @@ const StorageService = {
 
                 request.onupgradeneeded = (event) => {
                     const db = event.target.result;
-                    console.log("StorageService: Upgrading DB and Flushing Data...");
+                    console.log("StorageService: Inaayos yung DB at nililinis yung data...");
 
-                    // Force Delete Old Stores for Clean Seed
+                    // Burahin muna yung mga lumang stores para fresh yung seed
                     if (db.objectStoreNames.contains('orders')) {
                         db.deleteObjectStore('orders');
                     }
@@ -39,7 +39,7 @@ const StorageService = {
                         db.deleteObjectStore('logs');
                     }
 
-                    // Create New Stores
+                    // Gawa tayo ng bagong stores dito
                     const orderStore = db.createObjectStore('orders', { keyPath: 'order_id' });
                     orderStore.createIndex('email', 'email', { unique: false });
                     orderStore.createIndex('phone', 'phone', { unique: false });
@@ -53,14 +53,14 @@ const StorageService = {
                         this.db = event.target.result;
                         console.log("StorageService: DB Connected (Prototype Mode)");
 
-                        // Auto-seed if empty
+                        // Seed natin automatically pag empty
                         const transaction = this.db.transaction(['orders'], 'readwrite');
                         const store = transaction.objectStore('orders');
                         const countRequest = store.count();
 
                         countRequest.onsuccess = () => {
                             if (countRequest.result === 0 && window.MOCK_BUYERS) {
-                                console.log("StorageService: Seeding Mock Data...");
+                                console.log("StorageService: Nilalagay na yung Mock Data...");
                                 window.MOCK_BUYERS.forEach(buyer => {
                                     const order = {
                                         order_id: buyer.id,
@@ -69,12 +69,12 @@ const StorageService = {
                                         phone: buyer.phone,
                                         address: buyer.shippingAddress,
                                         order_type: buyer.orderType,
-                                        status: buyer.status || 'Pending'
+                                        status: buyer.status || 'Pending' // Default muna sa Pending
                                     };
                                     store.put(order);
                                 });
 
-                                // Wait for transaction to finish before resolving init
+                                // Hintayin muna matapos yung transaction bago mag-resolve
                                 transaction.oncomplete = () => {
                                     console.log("StorageService: Seeded " + window.MOCK_BUYERS.length + " orders.");
                                     resolve(true);
@@ -85,7 +85,7 @@ const StorageService = {
                                     reject("Seeding failed");
                                 }
                             } else {
-                                // No seeding needed
+                                // Hindi na kailangan mag-seed, okay na
                                 resolve(true);
                             }
                         };
@@ -108,9 +108,9 @@ const StorageService = {
     },
 
     /**
-     * Import Bulk Master Data (Admin)
-     * Replaces existing master data.
-     * @param {Array} orders - Array of order objects
+     * Bulk Import ng Master Data (Para sa Admin)
+     * Papalitan nito yung mga lumang data.
+     * @param {Array} orders - Array ng mga order objects
      */
     importOrders: async function (orders) {
         if (this.mode !== 'PROTOTYPE') return; // TODO: Sheets mode logic
@@ -119,9 +119,9 @@ const StorageService = {
             const transaction = this.db.transaction(['orders'], 'readwrite');
             const store = transaction.objectStore('orders');
 
-            // Clear old data first? Or Upsert?
-            // Requirement: "Clear Data" is separate. "Import" might be additive or replace.
-            // Let's assume Import adds/overwrites based on ID.
+            // Linisin muna natin bago baguhin? O dagdag lang?
+            // "Clear Data" is separate. "Import" baka additive o replace.
+            // Assumption muna tayo: Import adds/overwrites base sa ID.
 
             orders.forEach(order => {
                 if (!order.order_id) return; // Skip invalid
@@ -138,7 +138,7 @@ const StorageService = {
     },
 
     /**
-     * Clear All Data (Admin)
+     * Burahin lahat ng Data (Admin)
      */
     clearAllData: async function () {
         if (this.mode !== 'PROTOTYPE') return;
@@ -168,21 +168,22 @@ const StorageService = {
         // 1. Find Order(s)
         const orders = await this._findOrdersByQuery(normalizedQuery);
 
-        // Privacy: If multiple matches or 0 matches, handle gracefully. 
-        // For strictly "Lookup by your ID", we usually expect unique email/phone.
-        // If duplicates exist, the requirement says "prefer matching by order_id... otherwise show select card".
-        // For now, let's return the FIRST match to compute state.
+        // Privacy: Pag maraming match o wala, handle natin nang maayos. 
+        // Strict tayo dito: "Lookup by your ID", kailangan unique email/phone.
+        // Kung may duplicate, sabi ng requirement "prefer matching by order_id... otherwise show select card".
+        // Balik muna natin yung FIRST match para ma-compute yung state.
 
         if (orders.length === 0) return null;
 
         // 2. Compute State for the first match
-        // (In a real app handling duplicates, we'd return a list of matches with partial info)
+        // Kung sakaling maraming duplicate, kailangan natin mag-pakita ng select card.
+        // Pero sa ngayon, balik muna natin yung pinaka-unang match para ma-compute.
         const order = orders[0];
         return await this.getComputedState(order.order_id);
     },
 
     /**
-     * Get computed state for an order (Project updates)
+     * Kunin yung computed state para sa order (Project updates)
      */
     getComputedState: async function (orderId) {
         const order = await this._getOrder(orderId);
@@ -205,23 +206,23 @@ const StorageService = {
             }
         });
 
-        // Determine Status based on logs? 
-        // Master has 'status'. Logs might 'CONFIRM'.
-        // If master says 'PENDING' but log has 'CONFIRM', override?
+        // Tingnan natin yung status base sa logs? 
+        // Master record may 'status'. Logs baka may 'CONFIRM'.
+        // Kung master record ay 'PENDING' pero may 'CONFIRM' log, i-override natin.
         const hasConfirm = logs.some(l => l.action_type === 'CONFIRM');
-        if (hasConfirm && finalState.status === 'Pending') { // Assuming 'Pending' is default
+        if (hasConfirm && finalState.status === 'Pending') { // Ang default natin ay 'Pending'
             finalState.status = 'Confirmed';
         }
 
         // if (updates.length > 0) {
-        //    finalState.status = 'Confirmed (Updated)'; // REMOVED per user request
+        //    finalState.status = 'Confirmed (Updated)'; // TANGGAL na to sabi ni user
         // }
 
         return finalState;
     },
 
     /**
-     * Log an action
+     * I-log yung action na ginawa
      */
     logAction: async function (orderId, actionType, changes = {}) {
         const logEntry = {
@@ -250,7 +251,7 @@ const StorageService = {
                     getRequest.onsuccess = () => {
                         const order = getRequest.result;
                         if (order) {
-                            // Apply changes to master record
+                            // Apply changes sa master record natin
                             Object.assign(order, changes);
                             orderStore.put(order);
                             console.log("StorageService: Master Data synced with update.", changes);
@@ -268,19 +269,19 @@ const StorageService = {
     },
 
     /**
-     * Broadcast Update (Real-Time)
+     * Broadcast yung Update (Real-Time yan)
      */
     notifyChange: function (type) {
         const channel = new BroadcastChannel('cassncase_updates');
         channel.postMessage({ type: type, timestamp: Date.now() });
-        channel.close(); // Send and close (admin will listen)
+        channel.close(); // Send na natin tapos close na (admin yung makikinig dito)
     },
 
     /**
-     * Get all logs (Admin Export)
+     * Kunin lahat ng logs (Para sa Admin Export)
      */
     getAllLogs: async function () {
-        if (this.mode !== 'PROTOTYPE') return []; // TODO
+        if (this.mode !== 'PROTOTYPE') return []; // TODO: Ayusin to pag Sheets mode na
         return new Promise((resolve) => {
             const request = this.db.transaction('logs').objectStore('logs').getAll();
             request.onsuccess = () => resolve(request.result);
@@ -288,7 +289,7 @@ const StorageService = {
     },
 
     /**
-     * Get all orders (Admin Table)
+     * Kunin lahat ng orders (Para sa Admin Table)
      */
     getAllOrders: async function () {
         if (this.mode !== 'PROTOTYPE') return [];
@@ -307,8 +308,8 @@ const StorageService = {
             const store = transaction.objectStore('orders');
             let results = [];
 
-            // Getting all for client-side filtering (simplest for multi-field search without complex indices)
-            // Ideally use index.
+            // Kunin lahat para sa client-side filtering (simple lang to kesa complex indices)
+            // Pero ideal talaga gumamit ng index.
             const request = store.getAll();
 
             request.onsuccess = () => {
@@ -327,7 +328,7 @@ const StorageService = {
                     }
                     return false;
                 });
-                console.log(`StorageSearch: Found ${matches.length} matches.`);
+                console.log(`StorageSearch: Nakahanap tayo ng ${matches.length} matches.`);
                 resolve(matches);
             };
         });

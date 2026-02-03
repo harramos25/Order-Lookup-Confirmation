@@ -1,6 +1,6 @@
 /**
  * Client-Side Controller
- * generic 'App' glue code that bridges UI and StorageService.
+ * Dito yung pinaka 'glue' code na nag-uugnay sa UI at StorageService natin.
  */
 
 const App = {
@@ -8,13 +8,13 @@ const App = {
     UPDATE_SELECTION_KEY: 'cassncase_update_fields',
 
     /**
-     * Initialize the system.
+     * Initialize natin yung system.
      */
     init: async function () {
         console.log("App Initializing...");
         try {
             await StorageService.init();
-            console.log("App Ready.");
+            console.log("App Ready na!");
         } catch (e) {
             console.error("App Init Failed:", e);
             alert("System Error: Storage could not be initialized.");
@@ -22,8 +22,8 @@ const App = {
     },
 
     /**
-     * Search for a buyer by Email or Phone.
-     * @param {string} query - Email or Phone number
+     * Hanap tayo ng buyer gamit yung Email o Phone number.
+     * @param {string} query - Email o Numero
      * @returns {Promise<object|null>} - Computed Buyer State
      */
     findBuyer: async function (query) {
@@ -31,14 +31,14 @@ const App = {
     },
 
     /**
-     * Start a session for a specific buyer.
+     * Simulan na yung session para sa isang buyer.
      */
     startSession: function (buyerId) {
         sessionStorage.setItem(this.SESSION_KEY, buyerId);
     },
 
     /**
-     * Get the current buyer in the "session".
+     * Kunin yung buyer na nasa current "session".
      */
     getCurrentBuyer: async function () {
         const buyerId = sessionStorage.getItem(this.SESSION_KEY);
@@ -47,22 +47,22 @@ const App = {
     },
 
     /**
-     * Log an action (CONFIRM or UPDATE).
+     * I-log yung action (kung nakapag CONFIRM o may UPDATE).
      */
     logAction: async function (buyerId, action, changes = null) {
         await StorageService.logAction(buyerId, action, changes);
     },
 
     /**
-     * Helper to get logs (for Admin).
+     * Helper para makuha yung logs (para sa Admin).
      */
     getLogs: async function () {
-        // This was for the old generic table. 
-        // Admin will use StorageService directly usually, but we keep this for compatibility if needed.
+        // Ito yung para sa dating generic table. 
+        // Admin usually diretso sa StorageService, pero keep natin to para safe.
         return await StorageService.getAllLogs();
     },
 
-    // --- Navigation Helpers --- //
+    // --- Navigation Helpers na gagamitin natin --- //
 
     setUpdateSelection: function (fields) {
         sessionStorage.setItem(this.UPDATE_SELECTION_KEY, JSON.stringify(fields));
@@ -74,7 +74,7 @@ const App = {
     }
 };
 
-// Initialize on load
+// Initialize muna pagka-load ng page
 document.addEventListener('DOMContentLoaded', () => {
     App.init();
 });

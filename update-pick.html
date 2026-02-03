@@ -91,12 +91,12 @@
     <script src="app.js"></script>
     <script src="ui-fx.js"></script>
     <script>
-        // Check session
+        // Check muna natin yung session
         (async () => {
-            await App.init(); // Ensure DB is connected
+            await App.init(); // Siguraduhin nating connected yung DB
             const buyer = await App.getCurrentBuyer();
             if (!buyer) {
-                // No session, redirect to home
+                // Pag walang session, balik muna tayo sa home
                 window.location.href = 'confirm-order.html';
                 return;
             }
@@ -117,9 +117,9 @@
                     return;
                 }
 
-                // Save selection
+                // I-save na natin yung napili
                 App.setUpdateSelection(selected);
-                // Navigate
+                // Lipat na tayo sa susunod
                 window.location.href = 'update-form.html';
             });
         })(); // End Async

@@ -41,7 +41,7 @@
     <script src="app.js"></script>
     <script src="ui-fx.js"></script>
     <script>
-        // Check session
+        // Check muna natin yung session
         const fieldsToUpdate = App.getUpdateSelection(); // ['email', 'phone', etc.]
 
         (async () => {
@@ -53,11 +53,11 @@
                 return;
             }
 
-            // Move the rest of the logic inside here because we need 'buyer'
+            // Dito yung logic sa loob kasi kailangan natin yung 'buyer' data
             const formContainer = document.getElementById('formFields');
             const dynamicForm = document.getElementById('dynamicForm');
 
-            // Field Config for Labels and Types
+            // Config para sa mga Labels at Types ng fields
             const fieldConfig = {
                 fullName: { label: "Full Name", type: "text" },
                 email: { label: "Email Address", type: "email" },
@@ -65,7 +65,7 @@
                 shippingAddress: { label: "Shipping Address", type: "text" }
             };
 
-            // Render Fields
+            // Render na natin yung mga Fields
             fieldsToUpdate.forEach(fieldKey => {
                 const config = fieldConfig[fieldKey];
                 if (!config) return;
@@ -82,7 +82,7 @@
                 input.id = fieldKey;
                 input.name = fieldKey;
                 const dbMap = { fullName: 'full_name', shippingAddress: 'address' };
-                input.value = buyer[fieldKey] || buyer[dbMap[fieldKey]] || ''; // Pre-fill with fallback
+                input.value = buyer[fieldKey] || buyer[dbMap[fieldKey]] || ''; // I-pre-fill natin para madali
                 input.required = true;
 
                 div.appendChild(label);
@@ -90,17 +90,17 @@
                 formContainer.appendChild(div);
             });
 
-            // Handle Submit
+            // Handle natin yung Submit button
             dynamicForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
-                // Collect Data
+                // Kunin muna yung mga Data
                 const changes = {};
                 const dbMap = { fullName: 'full_name', shippingAddress: 'address' };
 
                 fieldsToUpdate.forEach(key => {
                     const val = document.getElementById(key).value.trim();
-                    // Check against original (checking both keys to be safe)
+                    // I-check natin laban sa original (check both keys para safe tayo)
                     const originalVal = buyer[key] || buyer[dbMap[key]];
 
                     if (val !== originalVal) {

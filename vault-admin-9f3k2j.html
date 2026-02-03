@@ -1003,23 +1003,23 @@
     <script src="app.js"></script>
     <script src="ui-fx.js"></script>
     <script>
-        // --- Security ---
+        // --- Para sa Security/Login ---
         const loginOverlay = document.getElementById('loginOverlay');
         const adminContent = document.getElementById('adminContent');
         const passcodeIn = document.getElementById('passcode');
         const unlockBtn = document.getElementById('unlockBtn');
         const authError = document.getElementById('authError');
 
-        // Check for existing session
+        // Check muna kung may existing session na
         if (sessionStorage.getItem('vault_unlocked') === 'true') {
-            showVault(false); // Immediate show
+            showVault(false); // Pakita agad yung vault
         }
 
         unlockBtn.addEventListener('click', async () => {
             if (passcodeIn.value === '1234') {
                 try {
                     unlockBtn.innerText = "Authenticating...";
-                    await StorageService.init(); // Ensure DB is ready
+                    await StorageService.init(); // Siguraduhin nating ready yung DB
                     showVault(true);
                 } catch (e) {
                     console.error("Init failed", e);
@@ -1037,13 +1037,13 @@
             if (e.key === 'Enter') unlockBtn.click();
         });
 
-        // --- Real-Time Updates ---
+        // Support din natin yung "Enter" key para mabilis
         const updatesChannel = new BroadcastChannel('cassncase_updates');
         updatesChannel.onmessage = (event) => {
             if (event.data.type === 'DATA_CHANGED') {
-                console.log("Admin: Verified Data Change. Refreshing...");
+                console.log("Admin: May nagbago sa data. Refresh muna natin...");
 
-                // Show toast notification
+                // Pakita yung toast notification
                 const toast = document.createElement('div');
                 toast.textContent = "Data Updated via System Sync";
                 toast.style.cssText = `
@@ -1056,7 +1056,7 @@
                 document.body.appendChild(toast);
                 setTimeout(() => toast.remove(), 3000);
 
-                // Reload Active View
+                // I-reload yung view na kasalukuyang naka-display
                 if (document.getElementById('view-dashboard').style.display === 'block') {
                     loadDashboard();
                 } else if (document.getElementById('view-orders').style.display === 'block') {
@@ -1065,7 +1065,7 @@
             }
         };
 
-        // CSS Animation for Toast
+        // CSS Animation para sa Toast notification
         const styleSheet = document.createElement("style");
         styleSheet.innerText = `
             @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -1076,7 +1076,7 @@
         function showVault(animate) {
             sessionStorage.setItem('vault_unlocked', 'true');
             loginOverlay.style.display = 'none';
-            adminContent.style.display = 'flex'; // Changed to flex for layout
+            adminContent.style.display = 'flex'; // Gawin nating flex para sa layout
 
             if (animate) {
                 setTimeout(() => adminContent.style.opacity = 1, 50);
@@ -1084,13 +1084,13 @@
                 adminContent.style.opacity = 1;
             }
 
-            // Initial Load: Dashboard
+            // Unang load: Dashboard muna ipakita
             switchSection('dashboard');
         }
 
-        // --- Navigation Logic ---
+        // --- Logic para sa pag-lipat ng Sections ---
         function switchSection(sectionId) {
-            // Update Sidebar
+            // Update natin yung itsura ng Sidebar
             document.querySelectorAll('.nav-item').forEach(el => {
                 el.classList.remove('active');
                 const onClickVal = el.getAttribute('onclick');
