@@ -545,6 +545,215 @@
                 display: none !important;
             }
         }
+
+        /* --- CONTROL DECK (Search) --- */
+        .control-deck {
+            margin-bottom: 2rem;
+            width: 100%;
+        }
+
+        .search-capsule {
+            background: rgba(20, 20, 28, 0.8);
+            /* Charcoal Glass */
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            /* High-tech Pill */
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            width: 70%;
+            /* Hero width */
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-capsule:focus-within {
+            border-color: #a855f7;
+            /* Purple focus */
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);
+            width: 75%;
+            /* Slight expansion */
+        }
+
+        .status-pulse {
+            width: 8px;
+            height: 8px;
+            background-color: #00F260;
+            /* Neon Green/Blue */
+            border-radius: 50%;
+            box-shadow: 0 0 8px #00F260;
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0% {
+                box-shadow: 0 0 0 0 rgba(0, 242, 96, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 6px rgba(0, 242, 96, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 242, 96, 0);
+            }
+        }
+
+        .status-text {
+            font-size: 0.75rem;
+            color: #e0f2e9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            opacity: 0.8;
+            white-space: nowrap;
+        }
+
+        .search-input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 1rem;
+            flex-grow: 1;
+            outline: none;
+            font-family: 'Nunito', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .lens-icon {
+            color: rgba(255, 255, 255, 0.3);
+            transition: color 0.3s, filter 0.3s;
+        }
+
+        .search-capsule:focus-within .lens-icon {
+            color: #a855f7;
+            filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.6));
+        }
+
+        /* --- ACTION ZONE (Ghost Button) --- */
+        .export-btn-ghost {
+            background: transparent;
+            border: 1px solid #10b981;
+            /* Neon Emerald */
+            color: #10b981;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            /* Hidden by default */
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        .export-btn-ghost:hover {
+            background: #10b981;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+        }
+
+        /* --- IMMERSIVE LOGOUT MODAL --- */
+        #lockModalOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            /* Dim background */
+            backdrop-filter: blur(10px);
+            /* Heavy blur focus */
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .lock-modal-card {
+            background: rgba(255, 255, 255, 0.05);
+            /* Lighter, clean glass */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2.5rem;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal-icon {
+            margin-bottom: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+        }
+
+        .lock-header {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.8rem;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        .lock-subtext {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+
+        .lock-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn-logout {
+            background: #b91c1c;
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            border: none;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: #dc2626;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        .btn-cancel {
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+            border: none;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 0.8rem 1rem;
+            transition: color 0.3s;
+        }
+
+        .btn-cancel:hover {
+            color: #fff;
+        }
     </style>
 </head>
 
@@ -558,6 +767,29 @@
             <input type="password" id="passcode" class="login-input" placeholder="••••">
             <button id="unlockBtn" class="login-btn">UNLOCK</button>
             <p id="authError" style="color: var(--warning-red); display: none; margin-top: 1rem;">Access Denied</p>
+        </div>
+    </div>
+
+    <!-- IMMERSIVE LOGOUT MODAL -->
+    <div id="lockModalOverlay">
+        <div class="lock-modal-card">
+            <div class="modal-icon">
+                <!-- Simple Power/Exit Icon -->
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+            </div>
+
+            <h2 class="lock-header">Log Out</h2>
+            <p class="lock-subtext">Are you sure you want to sign out?</p>
+
+            <div class="lock-actions">
+                <button id="cancelLockBtn" class="btn-cancel">Cancel</button>
+                <button id="confirmLockBtn" class="btn-logout">Log Out</button>
+            </div>
         </div>
     </div>
 
@@ -616,10 +848,21 @@
         <main class="main-content">
             <!-- Header -->
             <header style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
-                <h2 id="pageTitle" style="color: var(--cream-text);">Dashboard Overview</h2>
-                <div style="color: var(--sage-soft); font-size: 0.9rem;">
-                    Admin Session Active
+                <div style="display: flex; flex-direction: column;">
+                    <h2 id="pageTitle" style="color: var(--cream-text);">Dashboard Overview</h2>
+                    <div style="color: var(--sage-soft); font-size: 0.9rem;">Admin Session Active</div>
                 </div>
+
+                <!-- ACTION ZONE: Ghost Export Button -->
+                <button id="exportBtn" class="export-btn-ghost">
+                    <!-- Download/Tray Icon -->
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span>Export Data</span>
+                </button>
             </header>
 
             <!-- VIEW: Dashboard -->
@@ -670,33 +913,27 @@
 
             <!-- VIEW: Order Management -->
             <section id="view-orders" style="display: none;">
-                <!-- Header Actions Row -->
-                <div class="actions-row"
-                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-
-                    <!-- Search Bar -->
-                    <div style="flex-grow: 1; max-width: 300px; display: flex; align-items: center; gap: 0.5rem;">
-                        <input type="text" id="orderSearchInput" placeholder="Search Order ID..."
-                            style="width: 100%; padding: 0.8rem; background: rgba(26, 21, 35, 0.6); border: 1px solid var(--lilac-light); border-radius: 8px; color: #fff;">
-                    </div>
-
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <!-- Sync Status Logic (Simulated) -->
-                        <div class="sync-status" style="margin-bottom: 0;">
-                            <span style="font-size: 1.2rem;">🔄</span>
-                            <div>
-                                <div style="font-size: 0.85rem; color: var(--lilac-light); text-transform: uppercase;">
-                                    System Status</div>
-                                <div style="color: #e0f2e9; font-size: 0.95rem;">Sync <strong
-                                        style="color: #4eef7b;">ON</strong></div>
-                            </div>
+                <!-- Control Deck (Search + Status) -->
+                <div class="control-deck">
+                    <div class="search-capsule">
+                        <!-- Status Indicator -->
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div class="status-pulse"></div>
+                            <span class="status-text">Sync Active</span>
                         </div>
 
-                        <button id="exportBtn" class="export-btn">
-                            <img src="Images/excel.png" alt="Excel" width="20" height="20"
-                                style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
-                            Export
-                        </button>
+                        <!-- Divider Line -->
+                        <div style="height: 20px; width: 1px; background: rgba(255,255,255,0.1); margin: 0 5px;"></div>
+
+                        <!-- Search Input -->
+                        <input type="text" id="orderSearchInput" class="search-input" placeholder="Search Order ID...">
+
+                        <!-- Lens Icon -->
+                        <svg class="lens-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
                     </div>
                 </div>
 
@@ -716,24 +953,24 @@
                         <tbody id="tableBody"></tbody>
                     </table>
                 </div>
-    </div>
-    </section>
+            </section>
 
-    <!-- VIEW: System Ops -->
-    <section id="view-system" style="display: none;">
-        <div class="glass-panel" style="padding: 2rem; text-align: center; border: 1px solid var(--warning-red);">
-            <h3 style="color: var(--warning-red); margin-bottom: 1rem;">Danger Zone</h3>
-            <p style="color: var(--cream-text); margin-bottom: 2rem;">
-                Perform system-wide resets. This action is irreversible.
-            </p>
-            <button id="clearDataBtn" class="btn"
-                style="background: rgba(226, 109, 109, 0.2); border: 1px solid var(--warning-red); color: var(--warning-red); cursor: pointer;">
-                ⚠️ Clear All System Data
-            </button>
-        </div>
-    </section>
+            <!-- VIEW: System Ops -->
+            <section id="view-system" style="display: none;">
+                <div class="glass-panel"
+                    style="padding: 2rem; text-align: center; border: 1px solid var(--warning-red);">
+                    <h3 style="color: var(--warning-red); margin-bottom: 1rem;">Danger Zone</h3>
+                    <p style="color: var(--cream-text); margin-bottom: 2rem;">
+                        Perform system-wide resets. This action is irreversible.
+                    </p>
+                    <button id="clearDataBtn" class="btn"
+                        style="background: rgba(226, 109, 109, 0.2); border: 1px solid var(--warning-red); color: var(--warning-red); cursor: pointer;">
+                        ⚠️ Clear All System Data
+                    </button>
+                </div>
+            </section>
 
-    </main>
+        </main>
     </div>
 
     <!-- Scroll To Top Button -->
@@ -852,6 +1089,13 @@
             ['view-dashboard', 'view-orders', 'view-system'].forEach(id => {
                 document.getElementById(id).style.display = 'none';
             });
+
+            // Toggle Header Export Button
+            const exportBtn = document.getElementById('exportBtn');
+            if (exportBtn) {
+                if (sectionId === 'orders') exportBtn.style.display = 'flex';
+                else exportBtn.style.display = 'none';
+            }
 
             // Show target
             document.getElementById('view-' + sectionId).style.display = 'block';
@@ -1065,28 +1309,56 @@
         }
 
         // --- Lock System Logic ---
-        function lockSystem() {
-            if (confirm("Lock the system?")) {
-                sessionStorage.removeItem('vault_unlocked');
-                adminContent.style.opacity = 0;
-                setTimeout(() => {
-                    adminContent.style.display = 'none';
-                    loginOverlay.style.display = 'flex';
-                    document.getElementById('passcode').value = '';
-                    document.getElementById('unlockBtn').innerText = 'UNLOCK';
-                }, 500);
-            }
+        // --- Lock System Logic ---
+        // Get Modal Elements
+        const lockModalOverlay = document.getElementById('lockModalOverlay');
+        const confirmLockBtn = document.getElementById('confirmLockBtn');
+        const cancelLockBtn = document.getElementById('cancelLockBtn');
+
+        function showLockModal() {
+            lockModalOverlay.style.display = 'flex';
+            // Small delay to allow display:flex to apply before opacity transition
+            setTimeout(() => {
+                lockModalOverlay.style.opacity = '1';
+                lockModalOverlay.querySelector('.lock-modal-card').style.transform = 'scale(1)';
+            }, 10);
         }
 
+        function hideLockModal() {
+            lockModalOverlay.style.opacity = '0';
+            lockModalOverlay.querySelector('.lock-modal-card').style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                lockModalOverlay.style.display = 'none';
+            }, 300);
+        }
+
+        // Actual Lock Action
+        function performLock() {
+            sessionStorage.removeItem('vault_unlocked');
+            adminContent.style.opacity = 0;
+            hideLockModal(); // Animates out
+            setTimeout(() => {
+                adminContent.style.display = 'none';
+                loginOverlay.style.display = 'flex';
+                document.getElementById('passcode').value = '';
+                document.getElementById('unlockBtn').innerText = 'UNLOCK';
+            }, 500);
+        }
+
+        // Event Listeners for Modal
+        if (confirmLockBtn) confirmLockBtn.addEventListener('click', performLock);
+        if (cancelLockBtn) cancelLockBtn.addEventListener('click', hideLockModal);
+
+        // Update Buttons to Trigger Modal
         const lockBtn = document.getElementById('lockSystemBtn');
         if (lockBtn) {
-            lockBtn.addEventListener('click', lockSystem);
+            lockBtn.addEventListener('click', showLockModal);
         }
 
         // Mobile Lock Button
         const mobileLockBtn = document.getElementById('mobileLockBtn');
         if (mobileLockBtn) {
-            mobileLockBtn.addEventListener('click', lockSystem);
+            mobileLockBtn.addEventListener('click', showLockModal);
         }
     </script>
 </body>
