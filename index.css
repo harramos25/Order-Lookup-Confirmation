@@ -1,5 +1,5 @@
 :root {
-    /* Color Palette */
+    /* --- Original Palette --- */
     --plum-midnight: #1a1523;
     --plum-darker: #2A2438;
     --cream-text: #F8F5F2;
@@ -8,11 +8,18 @@
     --gold-accent: #D4AF37;
     --sage-soft: #9BB8A0;
     --warning-red: #E26D6D;
-    
-    /* Functional */
+
+    /* --- FX Variables (Adapted) --- */
     --glass-bg: rgba(42, 36, 56, 0.6);
     --glass-border: rgba(255, 255, 255, 0.1);
-    --shadow-soft: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    --cosmic-glow: rgba(122, 108, 157, 0.4);
+    /* Lilac Glow */
+
+    /* Functional Map using Original Palette */
+    --text-primary: var(--cream-text);
+    --text-secondary: var(--lilac-light);
+    --accent-primary: var(--lilac-deep);
+    --accent-secondary: var(--gold-accent);
 }
 
 * {
@@ -29,81 +36,105 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-image: 
-        radial-gradient(circle at 10% 20%, rgba(122, 108, 157, 0.1) 0%, transparent 20%),
-        radial-gradient(circle at 90% 80%, rgba(212, 175, 55, 0.05) 0%, transparent 20%);
+    justify-content: center;
+    overflow-x: hidden;
+
+    /* Dynamic Background (Original Colors) */
+    background:
+        radial-gradient(circle at 10% 20%, rgba(122, 108, 157, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(212, 175, 55, 0.1) 0%, transparent 40%),
+        linear-gradient(to bottom, #1a1523, #2A2438);
+    background-size: 200% 200%;
+    animation: nebulaDrift 20s ease-in-out infinite alternate;
 }
 
-/* Typography */
-h1, h2, h3 {
+/* --- Animations --- */
+@keyframes nebulaDrift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background-position: 100% 50%;
+    }
+}
+
+@keyframes materializeUp {
+    0% {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+        filter: blur(5px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes waterfallFade {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- Typography --- */
+h1,
+h2,
+h3 {
     font-family: 'Cinzel Decorative', serif;
     font-weight: 700;
     color: var(--lilac-light);
+    text-shadow: 0 0 15px rgba(181, 168, 209, 0.3);
 }
 
 .brand-font {
     font-family: 'Playfair Display', serif;
 }
 
-/* Utility Classes */
+.subtitle {
+    color: var(--sage-soft);
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+}
+
+/* --- Glass Panel (3D Enabled) --- */
+.container {
+    width: 100%;
+    max-width: 600px;
+    padding: 2rem;
+    perspective: 1000px;
+    /* 3D Context */
+}
+
 .glass-panel {
     background: var(--glass-bg);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--glass-border);
     border-radius: 20px;
-    box-shadow: var(--shadow-soft);
+    padding: 2.5rem;
+    box-shadow:
+        0 15px 40px -10px rgba(0, 0, 0, 0.4),
+        0 0 20px rgba(122, 108, 157, 0.1);
+
+    /* 3D Transform */
+    transform-style: preserve-3d;
+    transition: transform 0.1s;
 }
 
-.container {
-    width: 100%;
-    max-width: 600px; /* Mobile-first constraint for forms */
-    padding: 2rem;
-    margin: 2rem auto;
-}
-
-.btn {
-    display: inline-block;
-    padding: 12px 24px;
-    border-radius: 50px;
-    border: none;
-    font-family: 'Nunito', sans-serif;
-    font-weight: 700;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    text-align: center;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, var(--lilac-deep), var(--plum-darker));
-    color: var(--cream-text);
-    border: 1px solid var(--lilac-light);
-    box-shadow: 0 4px 15px rgba(122, 108, 157, 0.4);
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(122, 108, 157, 0.6);
-    filter: brightness(1.1);
-}
-
-.btn-secondary {
-    background: transparent;
-    border: 1px solid var(--sage-soft);
-    color: var(--sage-soft);
-}
-
-.btn-secondary:hover {
-    background: rgba(155, 184, 160, 0.1);
-    color: var(--cream-text);
-    border-color: var(--cream-text);
-}
-
+/* --- Inputs --- */
 .input-group {
     margin-bottom: 1.5rem;
     text-align: left;
+    position: relative;
 }
 
 label {
@@ -118,53 +149,153 @@ input[type="text"],
 input[type="email"],
 input[type="tel"] {
     width: 100%;
-    padding: 12px 16px;
+    padding: 14px 18px;
     background: rgba(26, 21, 35, 0.6);
     border: 1px solid var(--lilac-deep);
     border-radius: 12px;
     color: var(--cream-text);
     font-family: 'Nunito', sans-serif;
     font-size: 1rem;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 input:focus {
     outline: none;
     border-color: var(--gold-accent);
-    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+    background: rgba(42, 36, 56, 0.8);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+    transform: translateY(-2px);
 }
 
-/* Status Badges */
-.badge {
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 0.8rem;
+/* --- Buttons --- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    border-radius: 50px;
+    border: none;
+    font-family: 'Nunito', sans-serif;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    text-align: center;
 }
 
-.badge-pending {
-    background: rgba(212, 175, 55, 0.2);
-    color: var(--gold-accent);
-    border: 1px solid var(--gold-accent);
+.btn-primary {
+    background: linear-gradient(135deg, var(--lilac-deep), var(--plum-darker));
+    color: var(--cream-text);
+    border: 1px solid var(--lilac-light);
+    box-shadow: 0 4px 15px rgba(122, 108, 157, 0.4);
 }
 
-.badge-confirmed {
-    background: rgba(155, 184, 160, 0.2);
-    color: #aedcb6;
-    border: 1px solid #aedcb6;
+.btn-primary:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(122, 108, 157, 0.6);
+    filter: brightness(1.1);
 }
 
-/* Mobile Responsiveness */
-@media (max-width: 480px) {
+.btn-primary:active {
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 1px solid var(--sage-soft);
+    color: var(--sage-soft);
+}
+
+.btn-secondary:hover {
+    background: rgba(155, 184, 160, 0.1);
+    border-color: var(--cream-text);
+    color: var(--cream-text);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(155, 184, 160, 0.2);
+}
+
+/* --- Badges & Details --- */
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(122, 108, 157, 0.2);
+    padding-bottom: 0.5rem;
+}
+
+.detail-label {
+    color: var(--lilac-light);
+    font-size: 0.9rem;
+}
+
+.detail-value {
+    color: var(--cream-text);
+    font-weight: 600;
+    text-align: right;
+}
+
+.status-ok {
+    color: #4eef7b;
+    /* Keeping the user requested green */
+    text-shadow: 0 0 5px rgba(78, 239, 123, 0.4);
+}
+
+/* --- Tablet --- */
+@media (max-width: 768px) {
     .container {
         padding: 1.5rem;
-        margin: 1rem auto;
-        width: 95%;
+        max-width: 90%;
     }
-    
+
+    h1 {
+        font-size: 2.2rem;
+    }
+
+    .glass-panel {
+        padding: 2rem;
+    }
+
+    .input-group {
+        margin-bottom: 1.2rem;
+    }
+}
+
+/* --- Mobile --- */
+@media (max-width: 480px) {
+    .container {
+        padding: 1rem;
+        width: 100%;
+        max-width: 100%;
+    }
+
     h1 {
         font-size: 1.8rem;
+    }
+
+    .glass-panel {
+        padding: 1.5rem;
+        border-radius: 15px;
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"] {
+        padding: 12px 15px;
+    }
+
+    .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.2rem;
+    }
+
+    .detail-value {
+        text-align: left;
     }
 }

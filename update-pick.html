@@ -87,36 +87,42 @@
     </div>
 
     <script src="buyers.js"></script>
+    <script src="storage.js"></script>
     <script src="app.js"></script>
+    <script src="ui-fx.js"></script>
     <script>
         // Check session
-        const buyer = App.getCurrentBuyer();
-        if (!buyer) {
-            // No session, redirect to home
-            window.location.href = 'confirm-order.html';
-        }
-
-        const continueBtn = document.getElementById('continueBtn');
-        const inputs = document.querySelectorAll('input[type="checkbox"]');
-
-        continueBtn.addEventListener('click', () => {
-            const selected = [];
-            inputs.forEach(input => {
-                if (input.checked) {
-                    selected.push(input.value);
-                }
-            });
-
-            if (selected.length === 0) {
-                alert("Please select at least one item to update.");
+        (async () => {
+            await App.init(); // Ensure DB is connected
+            const buyer = await App.getCurrentBuyer();
+            if (!buyer) {
+                // No session, redirect to home
+                window.location.href = 'confirm-order.html';
                 return;
             }
 
-            // Save selection
-            App.setUpdateSelection(selected);
-            // Navigate
-            window.location.href = 'update-form.html';
-        });
+            const continueBtn = document.getElementById('continueBtn');
+            const inputs = document.querySelectorAll('input[type="checkbox"]');
+
+            continueBtn.addEventListener('click', () => {
+                const selected = [];
+                inputs.forEach(input => {
+                    if (input.checked) {
+                        selected.push(input.value);
+                    }
+                });
+
+                if (selected.length === 0) {
+                    alert("Please select at least one item to update.");
+                    return;
+                }
+
+                // Save selection
+                App.setUpdateSelection(selected);
+                // Navigate
+                window.location.href = 'update-form.html';
+            });
+        })(); // End Async
     </script>
 </body>
 

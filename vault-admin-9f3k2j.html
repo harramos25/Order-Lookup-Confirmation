@@ -11,127 +11,533 @@
         rel="stylesheet">
     <!-- Styles -->
     <link rel="stylesheet" href="index.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        .container {
-            max-width: 1000px;
-            /* Wider for table */
+        /* --- Layout --- */
+        body {
+            overflow: hidden;
+            /* Prevent body scroll, let content scroll */
         }
 
-        /* Login Overlay */
+        .app-container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* --- Login Overlay --- */
         #loginOverlay {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--plum-midnight);
+            width: 100vw;
+            height: 100vh;
+            background: rgba(18, 14, 28, 0.6);
+            /* Semi-transparent dark base */
+            backdrop-filter: blur(15px);
+            /* Strong blur */
             z-index: 1000;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .table-container {
-            overflow-x: auto;
-            margin-top: 2rem;
-            background: rgba(42, 36, 56, 0.4);
+        .login-card {
+            background: linear-gradient(135deg, rgba(42, 36, 56, 0.9), rgba(26, 21, 35, 0.95));
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .login-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(122, 108, 157, 0.3);
+            color: var(--cream-text);
+            padding: 1rem;
             border-radius: 12px;
+            text-align: center;
+            letter-spacing: 4px;
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .login-input:focus {
+            border-color: var(--gold-accent);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(90deg, var(--lilac-deep), var(--plum-darker));
+            border: 1px solid var(--lilac-light);
+            color: var(--cream-text);
+            font-family: 'Cinzel Decorative', cursive;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .login-btn:hover {
+            background: linear-gradient(90deg, var(--plum-darker), var(--lilac-deep));
+            box-shadow: 0 0 20px rgba(122, 108, 157, 0.5);
+            transform: translateY(-2px);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- Sidebar (Holographic) --- */
+        .sidebar {
+            width: 260px;
+            background: rgba(20, 20, 28, 0.6);
+            /* Smokey charcoal glass */
+            backdrop-filter: blur(12px);
+            /* Frosted effect */
+            border-right: 1px solid rgba(139, 92, 246, 0.5);
+            /* Violet thread */
+            box-shadow: 5px 0 25px rgba(139, 92, 246, 0.15);
+            /* Violet glow */
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 1rem;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .sidebar-brand {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.8rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            /* Cinematic Metal Gradient */
+            background: linear-gradient(to bottom, #E2E8F0, #FCD34D);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
+            /* Backlit LED */
+            letter-spacing: 2px;
+        }
+
+        .nav-item {
+            padding: 1rem 1.5rem;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+            /* Sharper for tech look */
+            color: rgba(255, 255, 255, 0.6);
+            /* 60% opacity white */
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+            /* Placeholder for laser */
+            font-family: 'Nunito', sans-serif;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .nav-item:hover {
+            color: #fff;
+            transform: translateX(5px);
+            /* Slide right */
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(251, 191, 36, 0.1), transparent);
+            /* Faint gold fade */
+            color: #fbbf24;
+            /* Electric Amber */
+            border-left: 3px solid #fbbf24;
+            /* Laser Bar */
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
+            /* Amber bloom */
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        .lock-btn {
+            width: 100%;
+            justify-content: center;
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            /* Solid Red Gradient */
+            color: #fff;
+            border: 1px solid #b91c1c;
+            margin-top: auto;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
+            letter-spacing: 2px;
+            box-shadow: 0 4px 6px rgba(185, 28, 28, 0.2);
+            padding: 1rem;
+        }
+
+        .lock-btn:hover {
+            background: linear-gradient(135deg, #f87171, #dc2626);
+            color: #fff;
+            transform: translateY(-2px);
+            border-color: #f87171;
+            box-shadow: 0 6px 12px rgba(220, 38, 38, 0.4);
+        }
+
+        /* --- Main Content --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* --- Dashboard Cards --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(42, 36, 56, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        .card-violet {
+            border-bottom: 2px solid #a855f7;
+        }
+
+        .card-violet::after {
+            background: #a855f7;
+            color: #a855f7;
+        }
+
+        .card-emerald {
+            border-bottom: 2px solid #10b981;
+        }
+
+        .card-emerald::after {
+            background: #10b981;
+            color: #10b981;
+        }
+
+        .card-amber {
+            border-bottom: 2px solid #f59e0b;
+        }
+
+        .card-amber::after {
+            background: #f59e0b;
+            color: #f59e0b;
+        }
+
+        .stat-value {
+            font-family: 'Nunito', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 0.5rem 0;
+            z-index: 2;
+        }
+
+        .stat-label {
+            color: var(--lilac-light);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            z-index: 2;
+        }
+
+        .watermark-icon {
+            position: absolute;
+            right: -10px;
+            bottom: -10px;
+            opacity: 0.1;
+            width: 120px;
+            height: 120px;
+            z-index: 1;
+            transform: rotate(-10deg);
+        }
+
+        /* --- Chart Section --- */
+        .chart-container {
+            background: rgba(42, 36, 56, 0.4);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--glass-border);
+            max-width: 600px;
+            height: 400px;
+            /* Fixed height to prevent infinite growth */
+            position: relative;
+            /* Required for Chart.js responsive mode */
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #statusChart {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* --- Order Management Styles --- */
+        .export-btn {
+            background: linear-gradient(135deg, rgba(34, 139, 34, 0.8), rgba(20, 90, 20, 0.9));
+            border: 1px solid rgba(78, 239, 123, 0.3);
+            color: #e0f2e9;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .export-btn:hover {
+            background: linear-gradient(135deg, rgba(40, 160, 40, 0.9), rgba(34, 139, 34, 1));
+            box-shadow: 0 6px 20px rgba(78, 239, 123, 0.25);
+            transform: translateY(-2px);
+            border-color: #4eef7b;
+            color: #fff;
+        }
+
+        .table-container {
+            background: rgba(42, 36, 56, 0.3);
+            border-radius: 16px;
+            overflow: hidden;
             border: 1px solid var(--glass-border);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            color: var(--cream-text);
-        }
-
-        th,
-        td {
-            text-align: left;
-            padding: 1rem;
-            border-bottom: 1px solid rgba(122, 108, 157, 0.2);
         }
 
         th {
-            background: rgba(122, 108, 157, 0.2);
+            background: rgba(26, 21, 35, 0.8);
             color: var(--lilac-light);
-            font-family: 'Cinzel Decorative', serif;
-        }
-
-        tr:hover {
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        .td-status {
-            font-weight: 700;
+            font-weight: 600;
+            text-transform: uppercase;
             font-size: 0.85rem;
+            letter-spacing: 1px;
+            padding: 1.2rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        td {
+            padding: 1rem;
+            color: var(--cream-text);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            font-size: 0.95rem;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
         }
 
         .status-ok {
-            color: #aedcb6;
+            color: #4eef7b;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(78, 239, 123, 0.3);
         }
 
         .status-pending {
             color: var(--gold-accent);
+            font-weight: 600;
         }
 
-        /* Scroll to Top Button */
-        #scrollTopBtn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 50px;
-            height: 50px;
-            background: var(--lilac-deep);
-            color: var(--cream-text);
-            border: 1px solid var(--lilac-light);
-            border-radius: 50%;
-            padding: 0;
-            /* Fix centering */
+        .sync-status {
+            background: rgba(78, 239, 123, 0.1);
+            border: 1px solid rgba(78, 239, 123, 0.2);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
             display: flex;
             align-items: center;
-            /* Ensure vertical centering */
-            justify-content: center;
-            /* Ensure horizontal centering */
-            line-height: 0;
-            /* Remove text height influence */
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        /* --- Mobile Toggle --- */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
             z-index: 100;
+            background: rgba(20, 20, 28, 0.8);
+            border: 1px solid var(--lilac-light);
+            padding: 0.5rem;
+            border-radius: 8px;
+            color: var(--lilac-light);
+            cursor: pointer;
         }
 
-        #scrollTopBtn:hover {
-            transform: translateY(-5px);
-            background: var(--plum-darker);
-        }
-
-        /* Mobile Optimization */
+        /* --- Responsive Styles --- */
         @media (max-width: 768px) {
-            header.admin-header {
+            .app-container {
                 flex-direction: column;
-                gap: 1rem;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                flex-shrink: 0;
+                flex-direction: row;
+                justify-content: space-around;
+                padding: 1rem;
+                overflow-x: auto;
+                border-right: none;
+                border-bottom: 1px solid rgba(139, 92, 246, 0.5);
+            }
+
+            .sidebar-brand {
+                display: none;
+                /* Save space */
+            }
+
+            .nav-item {
+                margin-bottom: 0;
+                flex-direction: column;
+                padding: 0.5rem;
+                font-size: 0.75rem;
                 text-align: center;
+                gap: 5px;
             }
 
-            h1 {
-                font-size: 1.5rem;
+            .nav-item svg {
+                width: 24px;
+                height: 24px;
             }
 
-            .container {
-                width: 95%;
-                margin: 1rem auto;
+            .lock-btn {
+                margin-top: 0;
+                width: auto;
+                padding: 0.5rem 1rem;
             }
 
-            /* Make table scrollable horizontally but card-like look */
+            /* Hide the lock button text on small tablets if needed, or keep it */
+        }
+
+        @media (max-width: 480px) {
+            .mobile-toggle {
+                display: block;
+                /* If we want a hamburger, but let's try the top bar approach first which is cleaner for apps */
+            }
+
+            .sidebar {
+                position: fixed;
+                bottom: 0;
+                top: auto;
+                width: 100%;
+                z-index: 50;
+                background: rgba(20, 20, 28, 0.95);
+                border-top: 1px solid rgba(139, 92, 246, 0.5);
+                border-bottom: none;
+                padding: 0.5rem;
+                justify-content: space-between;
+            }
+
+            .main-content {
+                padding: 1rem;
+                padding-bottom: 80px;
+                /* Space for bottom nav */
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                /* Stack cards */
+            }
+
+            .stat-card {
+                margin-bottom: 1rem;
+            }
+
+            .stat-value {
+                font-size: 2.5rem;
+            }
+
+            /* Table Responsive */
             .table-container {
-                margin-top: 1rem;
+                overflow-x: auto;
             }
 
-            th,
-            td {
-                padding: 0.8rem 0.5rem;
-                font-size: 0.9rem;
+            table {
+                min-width: 600px;
+                /* Force scroll */
+            }
+
+            /* Adjust Lock Button for Bottom Nav */
+            .lock-btn {
+                display: none;
+            }
+
+            .desktop-only {
+                display: none !important;
             }
         }
     </style>
@@ -141,47 +547,171 @@
 
     <!-- Security Overlay -->
     <div id="loginOverlay">
-        <div class="glass-panel" style="padding: 3rem; text-align: center;">
-            <h2 style="margin-bottom: 1.5rem;">Vault Access</h2>
-            <input type="password" id="passcode" placeholder="Enter Passcode"
-                style="margin-bottom: 1rem; text-align: center; letter-spacing: 4px;">
-            <button id="unlockBtn" class="btn btn-primary" style="width: 100%;">Unlock</button>
+        <div class="login-card">
+            <h2 style="margin-bottom: 1.5rem; color: var(--gold-accent); font-family: 'Cinzel Decorative', serif;">Vault
+                Access</h2>
+            <input type="password" id="passcode" class="login-input" placeholder="••••">
+            <button id="unlockBtn" class="login-btn">UNLOCK</button>
             <p id="authError" style="color: var(--warning-red); display: none; margin-top: 1rem;">Access Denied</p>
         </div>
     </div>
 
-    <!-- Admin Content -->
-    <div class="container" id="adminContent" style="display: none; opacity: 0; transition: opacity 1s;">
-        <header class="admin-header"
-            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-            <h1>Order Confirmations</h1>
-            <button id="exportBtn" class="btn btn-secondary" style="display: flex; align-items: center; gap: 8px;">
-                <img src="Images/excel.png" alt="Excel" width="20" height="20">
-                Export Excel
-            </button>
-        </header>
+    <!-- Clear Data Modal Removed -->
 
-        <div class="glass-panel" style="padding: 1rem;">
-            <div class="table-container">
-                <table id="ordersTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Full Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Address</th>
-                            <th>Order Type</th>
-                            <th>Status</th>
-                            <!-- <th>Last Action</th> -->
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        <!-- JS Populated -->
-                    </tbody>
-                </table>
+    <!-- Admin Content -->
+    <!-- Admin Content -->
+    <div class="app-container" id="adminContent" style="display: none; opacity: 0; transition: opacity 1s;">
+
+        <!-- Sidebar (Becomes Bottom Nav on Mobile) -->
+        <nav class="sidebar">
+            <div class="sidebar-brand">Admin.</div>
+            <a class="nav-item active" onclick="switchSection('dashboard')">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" />
+                </svg>
+                <span>Overview</span>
+            </a>
+            <a class="nav-item" onclick="switchSection('orders')">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z" />
+                </svg>
+                <span>Orders</span>
+            </a>
+            <a class="nav-item" onclick="switchSection('system')">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.5.44l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.04.26.25.44.5.44h4c.25 0 .46-.18.5-.44l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z" />
+                </svg>
+                <span>System</span>
+            </a>
+
+            <!-- Mobile specific lock placement could be separate, but let's keep it in flow or hide it -->
+            <div style="margin-top: auto; padding-top: 2rem;" class="desktop-only">
+                <button id="lockSystemBtn" class="nav-item lock-btn">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+                    </svg>
+                    LOCK
+                </button>
             </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+                <h2 id="pageTitle" style="color: var(--cream-text);">Dashboard Overview</h2>
+                <div style="color: var(--sage-soft); font-size: 0.9rem;">
+                    Admin Session Active
+                </div>
+            </header>
+
+            <!-- VIEW: Dashboard -->
+            <section id="view-dashboard">
+                <!-- Status Cards -->
+                <div class="stats-grid">
+                    <!-- Total Orders (Violet) -->
+                    <div class="stat-card card-violet">
+                        <span class="stat-label">Total Orders</span>
+                        <div class="stat-value" id="stat-total">0</div>
+                        <!-- Watermark: Shopping Cart -->
+                        <svg class="watermark-icon" fill="currentColor" viewBox="0 0 24 24" style="color: #a855f7;">
+                            <path
+                                d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" />
+                        </svg>
+                    </div>
+
+                    <!-- Confirmed (Emerald) -->
+                    <div class="stat-card card-emerald">
+                        <span class="stat-label">Confirmed</span>
+                        <div class="stat-value" id="stat-confirmed" style="color: #fff;">0</div>
+                        <!-- Watermark: Shield Check -->
+                        <svg class="watermark-icon" fill="currentColor" viewBox="0 0 24 24" style="color: #10b981;">
+                            <path
+                                d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z" />
+                        </svg>
+                    </div>
+
+                    <!-- Pending (Amber) -->
+                    <div class="stat-card card-amber">
+                        <span class="stat-label">Pending</span>
+                        <div class="stat-value" id="stat-pending" style="color: #fff;">0</div>
+                        <!-- Watermark: Hourglass -->
+                        <svg class="watermark-icon" fill="currentColor" viewBox="0 0 24 24" style="color: #f59e0b;">
+                            <path
+                                d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6zm10 14.5V20H8v-3.5l4-4 4 4z" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Chart -->
+                <div class="chart-container">
+                    <h3 style="text-align: center; margin-bottom: 1rem; font-size: 1.2rem;">Order Status Distribution
+                    </h3>
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </section>
+
+            <!-- VIEW: Order Management -->
+            <section id="view-orders" style="display: none;">
+                <!-- Header Actions Row -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+
+                    <!-- Sync Status Logic (Simulated) -->
+                    <div class="sync-status">
+                        <span style="font-size: 1.2rem;">🔄</span>
+                        <div>
+                            <div
+                                style="font-size: 0.85rem; color: var(--lilac-light); text-transform: uppercase; letter-spacing: 1px;">
+                                System Status</div>
+                            <div style="color: #e0f2e9; font-size: 0.95rem;">Master Data Sync <strong
+                                    style="color: #4eef7b;">ACTIVE</strong></div>
+                        </div>
+                    </div>
+
+                    <button id="exportBtn" class="export-btn">
+                        <img src="Images/excel.png" alt="Excel" width="20" height="20"
+                            style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
+                        Export to Excel
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table id="ordersTable">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Address</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+    </div>
+    </section>
+
+    <!-- VIEW: System Ops -->
+    <section id="view-system" style="display: none;">
+        <div class="glass-panel" style="padding: 2rem; text-align: center; border: 1px solid var(--warning-red);">
+            <h3 style="color: var(--warning-red); margin-bottom: 1rem;">Danger Zone</h3>
+            <p style="color: var(--cream-text); margin-bottom: 2rem;">
+                Perform system-wide resets. This action is irreversible.
+            </p>
+            <button id="clearDataBtn" class="btn"
+                style="background: rgba(226, 109, 109, 0.2); border: 1px solid var(--warning-red); color: var(--warning-red); cursor: pointer;">
+                ⚠️ Clear All System Data
+            </button>
         </div>
+    </section>
+
+    </main>
     </div>
 
     <!-- Scroll To Top Button -->
@@ -196,7 +726,9 @@
     <!-- SheetJS for Excel Export -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <script src="buyers.js"></script>
+    <script src="storage.js"></script>
     <script src="app.js"></script>
+    <script src="ui-fx.js"></script>
     <script>
         // --- Security ---
         const loginOverlay = document.getElementById('loginOverlay');
@@ -210,126 +742,306 @@
             showVault(false); // Immediate show
         }
 
-        unlockBtn.addEventListener('click', () => {
+        unlockBtn.addEventListener('click', async () => {
             if (passcodeIn.value === '1234') {
-                showVault(true);
+                try {
+                    unlockBtn.innerText = "Authenticating...";
+                    await StorageService.init(); // Ensure DB is ready
+                    showVault(true);
+                } catch (e) {
+                    console.error("Init failed", e);
+                    unlockBtn.innerText = "Error";
+                    alert("System Error: Storage Initialization Failed. Please reload.");
+                }
             } else {
                 authError.style.display = 'block';
+                passcodeIn.value = '';
             }
         });
+
+        // Add Enter Key Support
+        passcodeIn.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') unlockBtn.click();
+        });
+
+        // --- Real-Time Updates ---
+        const updatesChannel = new BroadcastChannel('cassncase_updates');
+        updatesChannel.onmessage = (event) => {
+            if (event.data.type === 'DATA_CHANGED') {
+                console.log("Admin: Verified Data Change. Refreshing...");
+
+                // Show toast notification
+                const toast = document.createElement('div');
+                toast.textContent = "Data Updated via System Sync";
+                toast.style.cssText = `
+                    position: fixed; bottom: 20px; right: 20px;
+                    background: #10b981; color: white; padding: 10px 20px;
+                    border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                    animation: fadeIn 0.5s, fadeOut 0.5s 2.5s forwards;
+                    z-index: 2000; font-family: 'Nunito', sans-serif;
+                `;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+
+                // Reload Active View
+                if (document.getElementById('view-dashboard').style.display === 'block') {
+                    loadDashboard();
+                } else if (document.getElementById('view-orders').style.display === 'block') {
+                    loadTable();
+                }
+            }
+        };
+
+        // CSS Animation for Toast
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = `
+            @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+            @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        `;
+        document.head.appendChild(styleSheet);
 
         function showVault(animate) {
             sessionStorage.setItem('vault_unlocked', 'true');
             loginOverlay.style.display = 'none';
-            adminContent.style.display = 'block';
+            adminContent.style.display = 'flex'; // Changed to flex for layout
 
             if (animate) {
                 setTimeout(() => adminContent.style.opacity = 1, 50);
             } else {
                 adminContent.style.opacity = 1;
             }
-            loadTable();
+
+            // Initial Load: Dashboard
+            switchSection('dashboard');
         }
 
-        // --- Data Logic ---
-        function loadTable() {
+        // --- Navigation Logic ---
+        function switchSection(sectionId) {
+            // Update Sidebar
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('active');
+                const onClickVal = el.getAttribute('onclick');
+                if (onClickVal && onClickVal.includes(sectionId)) {
+                    el.classList.add('active');
+                }
+            });
+
+            // Hide all views
+            ['view-dashboard', 'view-orders', 'view-system'].forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+
+            // Show target
+            document.getElementById('view-' + sectionId).style.display = 'block';
+
+            // Update Header Title
+            const titles = {
+                'dashboard': 'Dashboard Overview',
+                'orders': 'Order Management',
+                'system': 'System Operations'
+            };
+            document.getElementById('pageTitle').innerText = titles[sectionId];
+
+            // Trigger Specific Loads
+            if (sectionId === 'dashboard') loadDashboard();
+            if (sectionId === 'orders') loadTable();
+        }
+
+        // --- Dashboard Logic ---
+        let statusChartInstance = null;
+
+        async function loadDashboard() {
+            try {
+                if (!StorageService.db) {
+                    console.log("Dashboard: Initializing DB...");
+                    await StorageService.init();
+                }
+
+                const allOrders = await StorageService.getAllOrders();
+                console.log(`Dashboard: Loaded ${allOrders.length} orders.`);
+
+                let confirmed = 0;
+                let pending = 0;
+
+                for (const order of allOrders) {
+                    const state = await StorageService.getComputedState(order.order_id);
+                    const s = (state.status || '').toLowerCase();
+                    if (s.includes('confirmed')) confirmed++;
+                    else pending++;
+                }
+
+                document.getElementById('stat-total').innerText = allOrders.length;
+                document.getElementById('stat-confirmed').innerText = confirmed;
+                document.getElementById('stat-pending').innerText = pending;
+
+                renderChart(confirmed, pending);
+            } catch (e) {
+                console.error("Dashboard Load Error:", e);
+            }
+        }
+
+        function renderChart(confirmed, pending) {
+            const canvas = document.getElementById('statusChart');
+            if (!canvas) {
+                console.error("Canvas element not found!");
+                return;
+            }
+            const ctx = canvas.getContext('2d');
+
+            if (statusChartInstance) {
+                statusChartInstance.destroy();
+            }
+
+            // Create Neon Gradients
+            // Electric Teal -> Neon Mint
+            const gradientConfirmed = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientConfirmed.addColorStop(0, '#00F260');
+            gradientConfirmed.addColorStop(1, '#0575E6');
+
+            // Luminous Amber -> Sunset Orange
+            const gradientPending = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientPending.addColorStop(0, '#FF8008');
+            gradientPending.addColorStop(1, '#FFC837');
+
+            // Fallback for empty data
+            let data = [confirmed, pending];
+            let bg = [gradientConfirmed, gradientPending];
+            let border = ['transparent', 'transparent'];
+
+            if (confirmed === 0 && pending === 0) {
+                data = [1];
+                bg = ['rgba(255, 255, 255, 0.2)']; // Increased visibility
+                border = ['rgba(255, 255, 255, 0.3)'];
+            }
+
+            statusChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: (confirmed === 0 && pending === 0) ? ['No Data'] : ['Confirmed', 'Pending'],
+                    datasets: [{
+                        data: data,
+                        backgroundColor: bg,
+                        borderColor: border,
+                        borderWidth: 0, // Cleaner look without borders
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%', // Thicker ring (thin cutout)
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#e0e0e0',
+                                font: {
+                                    family: "'Nunito', sans-serif",
+                                    size: 14
+                                },
+                                usePointStyle: true, // Use dots
+                                pointStyle: 'circle'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- Clear Data Logic ---
+        const clearBtn = document.getElementById('clearDataBtn');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', async () => {
+                if (confirm("Are you sure? This will wipe all orders and logs. The system will reset to defaults on reload.")) {
+                    const pwd = prompt("Enter Admin Password:");
+                    if (pwd === "1234") {
+                        await StorageService.clearAllData();
+                        alert("Data Cleared. Reloading...");
+                        window.location.reload();
+                    } else {
+                        alert("Incorrect Password.");
+                    }
+                }
+            });
+        }
+
+        // --- Data Logic (Orders Table) ---
+        async function loadTable() {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
 
-            const allBuyers = window.MOCK_BUYERS;
-            const logs = App.getLogs();
+            const allOrders = await StorageService.getAllOrders();
 
-            allBuyers.forEach(buyer => {
-                let displayBuyer = { ...buyer };
-
-                const buyerUpdates = logs.filter(l => l.buyerId === buyer.id && l.action === 'UPDATE');
-                if (buyerUpdates.length > 0) {
-                    displayBuyer.status = "Confirmed (Updated)";
-                    buyerUpdates.forEach(u => {
-                        if (u.changes) displayBuyer = { ...displayBuyer, ...u.changes };
-                    });
-                } else {
-                    const confirmed = logs.find(l => l.buyerId === buyer.id && l.action === 'CONFIRM');
-                    if (confirmed) {
-                        displayBuyer.status = "Confirmed";
-                    }
-                }
+            for (const order of allOrders) {
+                const displayBuyer = await StorageService.getComputedState(order.order_id);
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><span style="color: var(--sage-soft); font-size: 0.8rem;">${displayBuyer.id}</span></td>
-                    <td>${displayBuyer.fullName}</td>
-                    <td>${displayBuyer.email}</td>
-                    <td>${displayBuyer.phone}</td>
-                    <td style="font-size: 0.9rem; max-width: 300px;">${displayBuyer.shippingAddress || displayBuyer.address}</td>
-                    <td>${displayBuyer.orderType}</td>
-                    <td class="td-status ${displayBuyer.status.includes('Confirmed') ? 'status-ok' : 'status-pending'}">
+                    <td><span style="color: var(--sage-soft); font-size: 0.8rem;">${displayBuyer.order_id}</span></td>
+                    <td>${displayBuyer.full_name || displayBuyer.fullName || '-'}</td>
+                    <td>${displayBuyer.email || '-'}</td>
+                    <td>${displayBuyer.phone || '-'}</td>
+                    <td style="font-size: 0.9rem; max-width: 300px;">${displayBuyer.address || displayBuyer.shippingAddress || '-'}</td>
+                    <td>${displayBuyer.order_type || displayBuyer.orderType || '-'}</td>
+                    <td class="td-status ${displayBuyer.status && displayBuyer.status.includes('Confirmed') ? 'status-ok' : 'status-pending'}">
                         ${displayBuyer.status}
                     </td>
                 `;
                 tbody.appendChild(tr);
-            });
+            }
         }
 
         // --- Export to Excel (.xlsx) using SheetJS ---
-        document.getElementById('exportBtn').addEventListener('click', () => {
-            const logs = App.getLogs();
-            const allBuyers = window.MOCK_BUYERS;
+        document.getElementById('exportBtn').addEventListener('click', async () => {
+            const allOrders = await StorageService.getAllOrders();
+            const dataToExport = [];
 
-            // Prepare Data for Sheet
-            const dataToExport = allBuyers.map(buyer => {
-                let final = { ...buyer };
-                const updates = logs.filter(l => l.buyerId === buyer.id && l.action === 'UPDATE');
-                if (updates.length > 0) {
-                    final.status = "Confirmed (Updated)";
-                    updates.forEach(u => { if (u.changes) final = { ...final, ...u.changes }; });
-                } else if (logs.find(l => l.buyerId === buyer.id && l.action === 'CONFIRM')) {
-                    final.status = "Confirmed";
-                }
-
-                return {
-                    "Order ID": final.id,
-                    "Full Name": final.fullName,
+            for (const order of allOrders) {
+                const final = await StorageService.getComputedState(order.order_id);
+                dataToExport.push({
+                    "Order ID": final.order_id,
+                    "Full Name": final.full_name || final.fullName,
                     "Email": final.email,
                     "Phone": final.phone,
-                    "Address": final.shippingAddress || final.address,
-                    "Order Type": final.orderType,
+                    "Address": final.address || final.shippingAddress,
+                    "Order Type": final.order_type || final.orderType,
                     "Status": final.status
-                };
-            });
+                });
+            }
 
-            // Creates a new workbook
             const wb = XLSX.utils.book_new();
-            // Converts json to sheet
             const ws = XLSX.utils.json_to_sheet(dataToExport);
-
-            // Adjust column widths (optional polish)
-            const wscols = [
-                { wch: 10 }, // ID
-                { wch: 20 }, // Name
-                { wch: 25 }, // Email
-                { wch: 15 }, // Phone
-                { wch: 30 }, // Address
-                { wch: 20 }, // Type
-                { wch: 20 }  // Status
-            ];
+            const wscols = [{ wch: 10 }, { wch: 20 }, { wch: 25 }];
             ws['!cols'] = wscols;
-
-            // Append sheet to workbook
             XLSX.utils.book_append_sheet(wb, ws, "Order Confirmations");
-
-            // Download file
             XLSX.writeFile(wb, "CassNcase_Orders.xlsx");
         });
 
         // --- Scroll to Top Logic ---
+        // --- Scroll to Top Logic ---
         const scrollBtn = document.getElementById('scrollTopBtn');
+        if (scrollBtn) {
+            scrollBtn.addEventListener('click', () => {
+                document.querySelector('.main-content').scrollTop = 0;
+            });
+        }
 
-        // Always active
-        scrollBtn.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-
+        // --- Lock System Logic ---
+        const lockBtn = document.getElementById('lockSystemBtn');
+        if (lockBtn) {
+            lockBtn.addEventListener('click', () => {
+                if (confirm("Lock the system?")) {
+                    sessionStorage.removeItem('vault_unlocked');
+                    adminContent.style.opacity = 0;
+                    setTimeout(() => {
+                        adminContent.style.display = 'none';
+                        loginOverlay.style.display = 'flex';
+                        document.getElementById('passcode').value = '';
+                        document.getElementById('unlockBtn').innerText = 'UNLOCK';
+                    }, 500);
+                }
+            });
+        }
     </script>
 </body>
 

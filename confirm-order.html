@@ -184,7 +184,9 @@
 
     <!-- Scripts -->
     <script src="buyers.js"></script>
+    <script src="storage.js"></script>
     <script src="app.js"></script>
+    <script src="ui-fx.js"></script>
     <script>
         // Page specific logic
         const searchBtn = document.getElementById('searchBtn');
@@ -207,30 +209,42 @@
 
         let currentBuyerId = null;
 
-        searchBtn.addEventListener('click', () => {
-            const query = searchInput.value;
-            const buyer = App.findBuyer(query); // App.js logic
+        searchBtn.addEventListener('click', async () => {
+            const query = searchInput.value.trim();
+
+            // 1. Empty Check
+            if (!query) {
+                errorMsg.textContent = "You cannot search without info. Please enter your Email or Phone.";
+                errorMsg.style.display = 'block';
+                orderPreview.style.display = 'none';
+                return;
+            }
+
+            // 2. Search
+            const buyer = await App.findBuyer(query);
 
             if (buyer) {
                 // Success
                 errorMsg.style.display = 'none';
                 showPreview(buyer);
             } else {
-                // Fail
+                // 3. Not Found (Wrong Data)
+                errorMsg.textContent = "Wrong Email or Phone Number. Please recheck your details.";
                 errorMsg.style.display = 'block';
                 orderPreview.style.display = 'none';
             }
         });
 
         function showPreview(buyer) {
-            currentBuyerId = buyer.id;
+            currentBuyerId = buyer.order_id || buyer.id;
 
             // Populate data
-            dispName.textContent = buyer.fullName;
-            dispEmail.textContent = buyer.email;
-            dispPhone.textContent = buyer.phone;
-            dispType.textContent = buyer.orderType;
-            dispAddress.textContent = buyer.shippingAddress;
+            // Populate data
+            dispName.textContent = buyer.full_name || buyer.fullName || '-';
+            dispEmail.textContent = buyer.email || '-';
+            dispPhone.textContent = buyer.phone || '-';
+            dispType.textContent = buyer.order_type || buyer.orderType || '-';
+            dispAddress.textContent = buyer.address || buyer.shippingAddress || '-';
 
             // Status Badge (Hidden)
             /*
@@ -252,10 +266,10 @@
         }
 
         // Action Handlers
-        confirmBtn.addEventListener('click', () => {
+        confirmBtn.addEventListener('click', async () => {
             if (!currentBuyerId) return;
             // Log confirmation
-            App.logAction(currentBuyerId, 'CONFIRM');
+            await App.logAction(currentBuyerId, 'CONFIRM');
             // Navigate to success
             window.location.href = 'success.html';
         });

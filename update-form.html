@@ -37,74 +37,82 @@
     </div>
 
     <script src="buyers.js"></script>
+    <script src="storage.js"></script>
     <script src="app.js"></script>
+    <script src="ui-fx.js"></script>
     <script>
         // Check session
-        const buyer = App.getCurrentBuyer();
         const fieldsToUpdate = App.getUpdateSelection(); // ['email', 'phone', etc.]
 
-        if (!buyer || fieldsToUpdate.length === 0) {
-            window.location.href = 'confirm-order.html';
-        }
+        (async () => {
+            await App.init();
+            const buyer = await App.getCurrentBuyer();
 
-        const formContainer = document.getElementById('formFields');
-        const dynamicForm = document.getElementById('dynamicForm');
+            if (!buyer || fieldsToUpdate.length === 0) {
+                window.location.href = 'confirm-order.html';
+                return;
+            }
 
-        // Field Config for Labels and Types
-        const fieldConfig = {
-            fullName: { label: "Full Name", type: "text" },
-            email: { label: "Email Address", type: "email" },
-            phone: { label: "Phone Number", type: "tel" },
-            shippingAddress: { label: "Shipping Address", type: "text" }
-        };
+            // Move the rest of the logic inside here because we need 'buyer'
+            const formContainer = document.getElementById('formFields');
+            const dynamicForm = document.getElementById('dynamicForm');
 
-        // Render Fields
-        fieldsToUpdate.forEach(fieldKey => {
-            const config = fieldConfig[fieldKey];
-            if (!config) return;
+            // Field Config for Labels and Types
+            const fieldConfig = {
+                fullName: { label: "Full Name", type: "text" },
+                email: { label: "Email Address", type: "email" },
+                phone: { label: "Phone Number", type: "tel" },
+                shippingAddress: { label: "Shipping Address", type: "text" }
+            };
 
-            const div = document.createElement('div');
-            div.className = 'input-group';
+            // Render Fields
+            fieldsToUpdate.forEach(fieldKey => {
+                const config = fieldConfig[fieldKey];
+                if (!config) return;
 
-            const label = document.createElement('label');
-            label.textContent = config.label;
-            label.htmlFor = fieldKey;
+                const div = document.createElement('div');
+                div.className = 'input-group';
 
-            const input = document.createElement('input');
-            input.type = config.type;
-            input.id = fieldKey;
-            input.name = fieldKey;
-            input.value = buyer[fieldKey] || ''; // Pre-fill
-            input.required = true;
+                const label = document.createElement('label');
+                label.textContent = config.label;
+                label.htmlFor = fieldKey;
 
-            div.appendChild(label);
-            div.appendChild(input);
-            formContainer.appendChild(div);
-        });
+                const input = document.createElement('input');
+                input.type = config.type;
+                input.id = fieldKey;
+                input.name = fieldKey;
+                const dbMap = { fullName: 'full_name', shippingAddress: 'address' };
+                input.value = buyer[fieldKey] || buyer[dbMap[fieldKey]] || ''; // Pre-fill with fallback
+                input.required = true;
 
-        // Handle Submit
-        dynamicForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            // Collect Data
-            const changes = {};
-            fieldsToUpdate.forEach(key => {
-                const val = document.getElementById(key).value;
-                if (val !== buyer[key]) {
-                    changes[key] = val;
-                }
+                div.appendChild(label);
+                div.appendChild(input);
+                formContainer.appendChild(div);
             });
 
-            // Log update (even if no "real" change detected, we log the confirmation of intent to update)
-            // But usually we want to confirm the order too.
-            // The button says "Submit Update & Confirm", so we do both (Update log implicitly confirms).
+            // Handle Submit
+            dynamicForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
 
-            // If changes is empty, it means they submitted the same data. We should still treat it as a confirmation/update.
+                // Collect Data
+                const changes = {};
+                const dbMap = { fullName: 'full_name', shippingAddress: 'address' };
 
-            App.logAction(buyer.id, 'UPDATE', changes);
-            window.location.href = 'success.html';
-        });
+                fieldsToUpdate.forEach(key => {
+                    const val = document.getElementById(key).value.trim();
+                    // Check against original (checking both keys to be safe)
+                    const originalVal = buyer[key] || buyer[dbMap[key]];
 
+                    if (val !== originalVal) {
+                        const dbKey = dbMap[key] || key;
+                        changes[dbKey] = val;
+                    }
+                });
+
+                await App.logAction(buyer.id || buyer.order_id, 'UPDATE', changes);
+                window.location.href = 'success.html';
+            });
+        })(); // End Async
     </script>
 </body>
 
