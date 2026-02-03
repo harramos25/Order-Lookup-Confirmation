@@ -268,7 +268,7 @@
             // I-log natin yung confirmation
             await App.logAction(currentBuyerId, 'CONFIRM');
             // Lipat na sa success page
-            window.location.href = 'success.html';
+            window.location.replace('success.html');
         });
 
         updateBtn.addEventListener('click', () => {

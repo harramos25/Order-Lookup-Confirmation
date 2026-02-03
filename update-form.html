@@ -110,7 +110,7 @@
                 });
 
                 await App.logAction(buyer.id || buyer.order_id, 'UPDATE', changes);
-                window.location.href = 'success.html';
+                window.location.replace('success.html');
             });
         })(); // End Async
     </script>
