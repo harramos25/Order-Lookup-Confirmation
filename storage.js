@@ -4,7 +4,7 @@
  */
 const StorageService = {
     dbName: 'CassNcaseDB',
-    dbVersion: 5,
+    dbVersion: 6,
     db: null,
     mode: 'PROTOTYPE', // 'PROTOTYPE' | 'SHEETS'
     apiConfig: {

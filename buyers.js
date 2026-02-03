@@ -2,7 +2,7 @@
 const MOCK_BUYERS = [
     {
         id: "CN-0001",
-        fullName: "Alyssa Mae Cruz",
+        fullName: "Skylar Millie Parker",
         email: "sky@example.com",
         phone: "09171234567",
         address: "Unit 404, The Grass Residences, Quezon City, Metro Manila",
